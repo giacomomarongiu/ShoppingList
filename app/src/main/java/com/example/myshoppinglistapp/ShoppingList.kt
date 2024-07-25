@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 
 data class ShoppingItem(
@@ -67,11 +69,8 @@ fun ShoppingListApp() {
             onClick = { showDialog = true },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(16.dp)
+                .padding(25.dp)
         ) {
-            //Esempio di lamda function
-            //val doubleNumber: (Int) -> Int = { it * 2 }
-            //Text(doubleNumber(5).toString())
             Text(text = "Add Item")
         }
         LazyColumn(
@@ -102,7 +101,7 @@ fun ShoppingListApp() {
                             }
                         },
                         onDeleteClick = {
-                            sItems = sItems-item
+                            sItems = sItems - item
                         }
                     )
                 }
@@ -112,6 +111,10 @@ fun ShoppingListApp() {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
+            modifier = Modifier.border(
+                border = BorderStroke(2.dp, Color(0xFF6200EA)), // Purple border color
+                shape = RoundedCornerShape(10)
+            ),
             confirmButton = {
                 Row(
                     modifier = Modifier
@@ -145,13 +148,21 @@ fun ShoppingListApp() {
                     }
                 }
             },
-            title = { Text(text = "Add shopping Item") },
+            title = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center // Center the title horizontally
+                ) {
+                    Text(text = "Add Shopping Item")
+                }
+            },
             text = {
                 Column {
                     OutlinedTextField(
                         value = itemName,
                         onValueChange = { itemName = it },
                         singleLine = true,
+                        label = { Text(text = "Item Name") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -160,6 +171,7 @@ fun ShoppingListApp() {
                         value = itemQuantity,
                         onValueChange = { itemQuantity = it },
                         singleLine = true,
+                        label = { Text(text = "Quantity") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -176,42 +188,63 @@ fun ShoppingListApp() {
 fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit) {
     var editedName by remember { mutableStateOf(item.name) }
     var editedQuantity by remember { mutableStateOf(item.quantity.toString()) }
-    var isEditing by remember { mutableStateOf(item.isEditing) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+            .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(20)) // Light grey background color
 
+            .border(BorderStroke(2.dp, Color(0xFF6200EA)), RoundedCornerShape(20)), // Purple border and rounded corners
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically // Center items vertically within the row
     ) {
-        Column() {
-            BasicTextField(
-                value = editedName,
-                onValueChange = { editedName = it },
-                singleLine = true,
+        Column {
+            Box(
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(10.dp),
-            )
-            BasicTextField(
-                value = editedQuantity,
-                onValueChange = { editedQuantity = it },
-                singleLine = true,
+                    .padding(8.dp) // Padding around the text field
+                    .border(
+                        border = BorderStroke(1.dp, Color(0xFF6200EA)), // Purple border color
+                        shape = RoundedCornerShape(10)
+                    )
+            ) {
+                BasicTextField(
+                    value = editedName,
+                    onValueChange = { editedName = it },
+                    singleLine = true,
+                    modifier = Modifier
+                        .padding(5.dp) // Padding inside the box, creating space between text and border
+                )
+            }
+            Box(
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(10.dp)
-            )
+                    .padding(8.dp) // Padding around the text field
+                    .border(
+                        border = BorderStroke(1.dp, Color(0xFF6200EA)), // Purple border color
+                        shape = RoundedCornerShape(10)
+                    )
+            ) {
+                BasicTextField(
+                    value = editedQuantity,
+                    onValueChange = { editedQuantity = it },
+                    singleLine = true,
+                    modifier = Modifier
+                        .padding(5.dp) // Padding inside the box, creating space between text and border
+                )
+            }
         }
-        Button(onClick = {
-            isEditing = true
-            onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
-        }) {
-            Text("Save")
+        Button(
+            onClick = {
+                onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
+            },
+            modifier = Modifier
+                .align(Alignment.CenterVertically) // Center the button vertically within the row
+                .padding(8.dp) // Add padding if needed
+        ) {
+            Text("Save", color = Color.White) // White text color
         }
     }
-
 }
 
 
@@ -226,22 +259,42 @@ fun ShoppingListItem(
             .padding(8.dp)
             .fillMaxWidth()
             .border(
-                border = BorderStroke(2.dp, Color.Black),
+                border = BorderStroke(2.dp, Color(0xFF6200EA)), // Purple border color
                 shape = RoundedCornerShape(20)
-            ),
-        horizontalArrangement = Arrangement.SpaceBetween
-
+            )
+            .background(Color(0xFFF0F0F0)) // Light grey background color
+            .padding(8.dp), // Internal padding
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically // Center vertically
     ) {
-        Text(text = item.name, modifier = Modifier.padding(8.dp))
-        Text(text = "Quantity: ${item.quantity}", modifier = Modifier.padding(8.dp))
+        Text(
+            text = item.name,
+            modifier = Modifier.padding(8.dp),
+            color = Color.Black,
+            fontSize = 20.sp
+        )
+        Text(
+            text = "Quantity: ${item.quantity}",
+            modifier = Modifier.padding(8.dp),
+            color = Color.Black,
+            fontSize = 20.sp
+        )
         Row(modifier = Modifier.padding(8.dp)) {
             IconButton(onClick = onEditClick) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Button")
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Button",
+                    tint = Color(0xFF6200EA)
+                ) // Purple icon
             }
             IconButton(onClick = onDeleteClick) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Button")
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Button",
+                    tint = Color.Red
+                ) // Red icon
             }
         }
     }
-
 }
+
